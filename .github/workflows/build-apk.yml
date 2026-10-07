@@ -11,15 +11,15 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
     - name: Setup Java JDK
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '17'
@@ -27,7 +27,7 @@ jobs:
     - name: Download game.zip from Google Drive
       run: |
         pip install gdown
-        gdown --id 1jHhpBcUFrNkQfA3r4pB2Ijmx7DR094lY -O game.zip
+        gdown https://drive.google.com/uc?id=1jHhpBcUFrNkQfA3r4pB2Ijmx7DR094lY -O game.zip --fuzzy
 
     - name: Install Cordova and Build APK
       run: |
