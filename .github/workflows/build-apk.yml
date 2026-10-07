@@ -49,12 +49,6 @@ jobs:
         # Enable Landscape & Fullscreen Mode in config.xml
         sed -i '/<\/widget>/i \    <preference name="Orientation" value="landscape" \/>' config.xml
         sed -i '/<\/widget>/i \    <preference name="Fullscreen" value="true" \/>' config.xml
-
-        # Icon handling
-        if [ -f "www/icon.png" ]; then
-          cp www/icon.png res/icon.png 2>/dev/null || true
-          echo '<platform name="android"><icon src="www/icon.png" /></platform>' >> config.xml
-        fi
         
         cordova build android --verbose
 
