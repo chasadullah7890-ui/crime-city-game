@@ -24,6 +24,11 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
+    - name: Download game.zip from Google Drive
+      run: |
+        pip install gdown
+        gdown --id 1jHhpBcUFrNkQfA3r4pB2Ijmx7DR094lY -O game.zip
+
     - name: Install Cordova and Build APK
       run: |
         npm install -g cordova
@@ -31,8 +36,14 @@ jobs:
         cd myApp
         cordova platform add android
         rm -rf www/*
-        cp -r ../* www/ 2>/dev/null || true
-        rm -rf www/myApp
+        
+        # Unzip game.zip into www folder
+        unzip ../game.zip -d www/
+        
+        # Move inner files if zipped inside a subfolder
+        if [ ! -f www/index.html ]; then
+          mv www/*/* www/ 2>/dev/null || true
+        fi
         
         # Enable Landscape & Fullscreen Mode in config.xml
         sed -i '/<\/widget>/i \    <preference name="Orientation" value="landscape" \/>' config.xml
@@ -51,3 +62,4 @@ jobs:
       with:
         name: Crime-City-Mafia-Underworld-APK
         path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+
