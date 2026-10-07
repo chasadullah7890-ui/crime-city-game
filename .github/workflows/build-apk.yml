@@ -1,0 +1,53 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Setup Java JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Install Cordova and Build APK
+      run: |
+        npm install -g cordova
+        cordova create myApp com.crimecity.mafia "Crime City: Mafia Underworld"
+        cd myApp
+        cordova platform add android
+        rm -rf www/*
+        cp -r ../* www/ 2>/dev/null || true
+        rm -rf www/myApp
+        
+        # Enable Landscape & Fullscreen Mode in config.xml
+        sed -i '/<\/widget>/i \    <preference name="Orientation" value="landscape" \/>' config.xml
+        sed -i '/<\/widget>/i \    <preference name="Fullscreen" value="true" \/>' config.xml
+
+        # Icon handling
+        if [ -f "www/icon.png" ]; then
+          cp www/icon.png res/icon.png 2>/dev/null || true
+          echo '<platform name="android"><icon src="www/icon.png" /></platform>' >> config.xml
+        fi
+        
+        cordova build android --verbose
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Crime-City-Mafia-Underworld-APK
+        path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
